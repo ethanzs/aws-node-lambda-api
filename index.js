@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
-const uri = "";
 
+/*------| Config |------*/
+
+const uri = "";
+let objectKey = "entry"; // Object key
+let keys = ["first", "last", "age", "email"]; // Keys within objectKey
+
+/*----------------------*/
+
+// Initialize Mongoose
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -10,14 +18,13 @@ mongoose.connect(uri, {
     console.log("MongoDB connection established.")
 });
 
+// Import Entry Model
 const Entry = require("./Models/Entry.js");
 
+// Handler
 exports.handler = async (event) => {
 
     // Check api call
-    let objectKey = "entry"; // Object key
-    let keys = ["first", "last", "age", "email"]; // Keys within objectKey
-
     if (event.hasOwnProperty(objectKey)) // If there is no entry object
     {
         if (Object.keys(event.entry).length == 4) // If the entry object does not consist of 4 key->val pairs
@@ -37,8 +44,6 @@ exports.handler = async (event) => {
         return { ERROR: "Invalid API call format. Entry is missing." }
     }
 
-    // no u dont
-
     // Upload to MongoDB
     const newEntry = new Entry({
         first: event.entry.first,
@@ -49,5 +54,6 @@ exports.handler = async (event) => {
     // Save
     let instance = await newEntry.save();
 
+    // Return new MongoDB Instance
     return { entry: instance }
 }
